@@ -1,44 +1,17 @@
 pipeline {
     agent any;
-    stages {
-        stage('git clone') {
-            steps {
-                git 'https://github.com/MuyleangIng/react-project.git'
-            }
-        }
-        stage('docker pipeline') {
-            steps {
-               script {
-                    docker.image('node:18.9.1').inside {
-                        sh '''
-                            npm install --force
-                            npm run build
-                        '''
-                    }
-                    docker.build("muyleangin/react-project:${BUILD_NUMBER}")
-                    // docker.withRegistry('docker.io', 'dockerhub') {
-                    // def customImage = docker.build("muyleangin/react-project:${BUILD_NUMBER}")
-
-                    // customImage.push()
-                    // }
-               }
-            }
-        }
-        stage('clean workspace'){
-            steps{
-                cleanWs()
-            }
-        }
+    parameters {
+        choice(name: "TEST_CHOICE", choices: ["production", "staging", "development"], description: "Samplemulti-choice parameter")
     }
-    post {
-        always {
-            echo "This is always run."
-        }
-        success {
-            echo "This block runs when the build is succeeded."
-        }
-        failure {
-            echo "This block runs when the build is failed."
+    stages {
+        stage('test choice') {
+            steps {
+                echo "${TEST_CHOICE}"
+                script {
+                    def gitbranch = "${TEST_CHOICE}"
+                    echo "branch git :" gitbranch 
+                }
+            }
         }
     }
 }
