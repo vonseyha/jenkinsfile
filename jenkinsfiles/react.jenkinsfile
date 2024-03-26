@@ -1,10 +1,21 @@
 pipeline {
     agent any
     stages {
-        stage('Hello') {
+        stage('git clone') {
             steps {
                 echo 'Hello, World!'
             }
         }
+        stage('build with docker file') {
+            steps {
+                echo 'Hello, World!'
+            }
+        }
+        stage('Hedeployllo') {
+            steps {
+                echo 'Hello, World!'
+            }
+        }
+
     }
 }
