@@ -15,11 +15,12 @@ pipeline {
                             npm run build
                         '''
                     }
-                    docker.withRegistry('docker.io', 'docker-hub') {
-                        def customImage = docker.build("vonseyha/react-project:${BUILD_NUMBER}")
+                    docker.build("muyleangin/react-project:${BUILD_NUMBER}")
+                    // docker.withRegistry('docker.io', 'dockerhub') {
+                    // def customImage = docker.build("muyleangin/react-project:${BUILD_NUMBER}")
 
-                        customImage.push()
-                    }
+                    // customImage.push()
+                    // }
                }
             }
         }
