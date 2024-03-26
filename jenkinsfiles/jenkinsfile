@@ -11,6 +11,7 @@ pipeline {
                script {
                     docker.image('node:18.9.1').inside {
                         sh '''
+                            npm install --force
                             npm run build
                         '''
                     }
@@ -29,7 +30,7 @@ pipeline {
             }
         }
     }
-    post {
+    posts {
         always {
             echo "This is always run."
         }
