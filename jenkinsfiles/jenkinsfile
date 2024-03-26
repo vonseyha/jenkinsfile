@@ -8,8 +8,9 @@ pipeline {
         }
         stage('docker pipeline') {
             steps {
-               script{
-                    docker.image('node:18.9.1').inside{
+               script {
+                    docker.image('node:18.9.1').inside {
+                        sh 'npm install' // Install dependencies
                         sh 'npm run build'
                     }
                     docker.build("muyleangin/react-project:${BUILD_NUMBER}")
