@@ -1,29 +1,10 @@
 pipeline {
-    agent {
-        docker {
-            image 'node:14'
-            args '-u root'
-        }
-    
-    }
+    agent any
     stages {
-        stage('git clone ') {
+        stage('Hello') {
             steps {
-                 git 'https://github.com/MuyleangIng/react-project.git'
+                echo 'Hello, World!'
             }
         }
-        stage('test') {
-            steps {
-                sh '''
-                node -v
-                '''
-            }
-        }
-        stage('docker pipeline') {
-            steps {
-                echo 'Building docker image'
-            }
-        }
-
     }
 }
