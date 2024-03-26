@@ -1,10 +1,21 @@
 pipeline {
-    agent any
+    agent any;
     stages {
-        stage('Hello') {
+        stage('git clone ') {
             steps {
-                echo 'Hello, World!'
+                 git 'https://github.com/MuyleangIng/react-project.git'
             }
         }
+        stage('docker pipeline') {
+            steps {
+               script{
+                    docker.image('node:18.9.1').inside{
+                        sh 'npm run build'
+                    }
+                    docker.build("muyleangin/react-project:${BUILD_NUMBER}")
+               }
+            }
+        }
+
     }
 }
