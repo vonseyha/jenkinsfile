@@ -9,7 +9,14 @@ pipeline {
                 echo "${TEST_CHOICE}"
                 script {
                     def gitbranch = "${TEST_CHOICE}"
-                    echo "branch git :" gitbranch 
+                    if( gitbranch == "production") {
+                        git branch: 'production', url: 'https://github.com/vonseyha/jenkinsfile.git'
+                    } else if (gitbranch == "staging") {
+                        git branch: 'staging', url: 'https://github.com/vonseyha/jenkinsfile.git'
+                    } else {
+                        git branch: 'development', url: 'https://github.com/vonseyha/jenkinsfile.git'
+                    }
+
                 }
             }
         }
