@@ -6,19 +6,23 @@ pipeline {
                 git 'https://github.com/MuyleangIng/react-project.git'
             }
         }
-        stage('docker pipeline') {
-            steps {
-               script {
-                    docker.image('node:18.9.1').inside {
-                        sh '''
-                            npm install --force
-                            npm run build
-                        '''
-                    }
-                    docker.build("muyleangin/react-project:${BUILD_NUMBER}")
-               }
+        // stage('docker pipeline') {
+        //     steps {
+        //        script {
+        //             docker.image('node:18.9.1').inside {
+        //                 sh '''
+        //                     npm install --force
+        //                     npm run build
+        //                 '''
+        //             }
+        //             docker.build("muyleangin/react-project:${BUILD_NUMBER}")
+        //        }
+        //     }
+        // }
+        stage('clean workspace'){
+            steps{
+                cleanWs()
             }
         }
-
     }
 }
