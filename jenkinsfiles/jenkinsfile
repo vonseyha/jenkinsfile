@@ -3,7 +3,7 @@ pipeline {
     stages {
         stage('git clone ') {
             steps {
-                 git 'https://github.com/MuyleangIng/react-project.git'
+                git 'https://github.com/MuyleangIng/react-project.git'
             }
         }
         stage('docker pipeline') {
