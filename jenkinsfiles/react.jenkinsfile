@@ -1,21 +1,93 @@
+@Library("My-Jenkins-SharedLibrary") _
+
 pipeline {
     agent any
-    stages {
-        stage('git clone') {
-            steps {
-                echo 'Hello, World!'
-            }
-        }
-        stage('build with docker file') {
-            steps {
-                echo 'Hello, World!'
-            }
-        }
-        stage('Hedeployllo') {
-            steps {
-                echo 'Hello, World!'
-            }
-        }
-
+     parameters {
+        booleanParam(name: 'BUILD_DOCKER', defaultValue: true, description: 'Build Docker Image')
+        booleanParam(name: 'DOCKER_DEPLOY', defaultValue: true, description: 'Docker Deploy')
+        choice(name: "TEST_CHOICE", choices: ["production", "staging"], description: "Sample multi-choice parameter")
+        string(name: 'REGISTRY_DOCKER', defaultValue: 'automatex', description: 'Registry')
+        string(name: 'BUILD_CONTAINER_NAME', defaultValue: 'reactjs', description: 'container')
+        string(name: 'CONTAINER_NAME', defaultValue: generateContainerName(), description: 'container')
+        string(name: 'DOCKER_TAG', defaultValue: 'latest', description: 'Docker_tag')
+        string(name: 'REPO_URL', defaultValue: 'https://github.com/MuyleangIng/react-project.git', description: 'Repository URL')
     }
+    environment {
+        TELEGRAM_BOT_TOKEN = '7047635532:AAEn4n_vHimnsRrLam5YXNvf5pMFkR0VXbo'
+        TELEGRAM_CHAT_ID = '680621061'
+        NAME_FOR_USER="${params.NAME_FOR_USER}"
+        REGISTRY_DOCKER="${params.REGISTRY_DOCKER}"
+        BUILD_CONTAINER_NAME="${params.BUILD_CONTAINER_NAME}"
+        CONTAINER_NAME= "${params.CONTAINER_NAME}"
+        DOCKER_TAG = "${params.DOCKER_TAG}"
+        //for mail
+        MAIL_SEND_TO = 'muyleanging@gmail.com'
+        //for port range 
+        MIN_PORT = '3000'
+        MAX_PORT = '3010'
+        //for git link 
+         REPO_URL="${params.REPO_URL}"
+        //REPO_URL = 'https://gitlab.com/MuyleangIng1/reactjs'
+        CREDENTIAL_GIT = 'password_for_gitlab'
+        BRANCH = 'main'
+    }
+    stages {
+        stage('Get Code from SCM') {
+            steps {
+                echo "TEST_CHOICE is ${TEST_CHOICE}"
+                script {
+                    gitHandler(
+                        REPO_URL,
+                        CREDENTIAL_GIT,
+                        BRANCH,
+                        TELEGRAM_BOT_TOKEN,
+                        TELEGRAM_CHAT_ID
+                    )
+                }
+            }
+        }
+        stage('Build') {
+            steps {
+                echo "Building Images for deploying"
+                script {
+                    def dockerfileContent = '''
+                        FROM node:18.12.1 as build
+                        WORKDIR /app
+                        COPY ./ ./
+                        RUN npm install --force
+                        RUN npm run build
+
+                        FROM nginx:1.23.2
+                        COPY --from=build /app/build /usr/share/nginx/html
+
+                        EXPOSE 80
+                        CMD ["nginx", "-g", "daemon off;"]
+                    '''
+
+                    // Write the Dockerfile content to a file
+                    writeFile file: 'Dockerfile', text: dockerfileContent
+
+                    // Build the Docker image using the specified Dockerfile
+                    def dockerImage = docker.build("react", "-f Dockerfile .")
+
+
+                    buildFrontend(REGISTRY_DOCKER, BUILD_CONTAINER_NAME, DOCKER_TAG, MAIL_SEND_TO, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID)
+                }
+            }
+        }
+        stage('Push image to registry') {
+            steps {
+                script {
+            withCredentials([usernamePassword(credentialsId: 'dckr_pat_QEcEU5u5a6nvDl4O6-54Bgz9OTk', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
+                sh "docker login -u $USER -p $PASS"
+                sh "docker push ${REGISTRY_DOCKER}/${BUILD_CONTAINER_NAME}:${DOCKER_TAG}"
+                     }
+                }
+             }
+        }    
+    }
+}
+def generateContainerName() {
+    // Generate a dynamic default value, for example, based on a timestamp or a random value
+    return "automatex-${new Date().getTime()}"
 }
