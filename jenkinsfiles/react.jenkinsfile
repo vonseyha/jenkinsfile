@@ -13,8 +13,8 @@ pipeline {
         string(name: 'REPO_URL', defaultValue: 'https://github.com/MuyleangIng/react-project.git', description: 'Repository URL')
     }
     environment {
-        TELEGRAM_BOT_TOKEN = '7047635532:AAEn4n_vHimnsRrLam5YXNvf5pMFkR0VXbo'
-        TELEGRAM_CHAT_ID = '680621061'
+        TELEGRAM_BOT_TOKEN = '--'
+        TELEGRAM_CHAT_ID = '--'
         NAME_FOR_USER="${params.NAME_FOR_USER}"
         REGISTRY_DOCKER="${params.REGISTRY_DOCKER}"
         BUILD_CONTAINER_NAME="${params.BUILD_CONTAINER_NAME}"
@@ -78,7 +78,7 @@ pipeline {
         stage('Push image to registry') {
             steps {
                 script {
-            withCredentials([usernamePassword(credentialsId: 'dckr_pat_QEcEU5u5a6nvDl4O6-54Bgz9OTk', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
+            withCredentials([usernamePassword(credentialsId: '--', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
                 sh "docker login -u $USER -p $PASS"
                 sh "docker push ${REGISTRY_DOCKER}/${BUILD_CONTAINER_NAME}:${DOCKER_TAG}"
                      }
